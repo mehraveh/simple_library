@@ -62,6 +62,13 @@ class AuthController extends Controller
 		
 
     }
+    public function show_borrows($borrower_id)
+    {
+		$borrows = DB::table('borrows')->where('borrower_id', $borrower_id)->get();
+        return json_encode($borrows);
+		
+
+    }
     protected function respondWithToken($token)
     {
       return response()->json([

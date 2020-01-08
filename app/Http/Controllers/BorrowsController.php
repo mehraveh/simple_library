@@ -54,7 +54,8 @@ class BorrowsController extends Controller
      */
     public function show($id)
     {
-        //
+        $borrow = Borrow::find($id);
+        return json_encode($borrow);
     }
 
     /**
@@ -77,7 +78,22 @@ class BorrowsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $borrow = Borrow::find($id);
+        if($borrow)
+        {
+            $borrow->borrower_id = $request->borrower_id;
+            $borrow->borrowed_at = $request->borrowed_at;
+            $borrow->take_back_at = $request->take_back_at;
+            $borrow->taken_back = $request->taken_back;
+            $borrow->book_id = $request->book_id;   
+            $borrow->save();
+        }
+
+        else
+        {
+            return ["message" => "borrow not found"];
+        }
+
     }
 
     /**
@@ -88,6 +104,8 @@ class BorrowsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $borrow = Borrow::find($id);
+        $borrow->delete();
+        return ["message" => "dropped successfully"];
     }
 }
