@@ -112,7 +112,6 @@ class AuthController extends Controller
 
     public function borrow(Request $request, $id)
     {
-    	return Auth::user();
     }
     protected function respondWithToken($token)
     {
