@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Books;
 use DB;
 class BookController extends Controller
 {
 	public function __construct()
 	{
-		//$this->middleware('auth1');
+		$this->middleware('jwt.verify');
 
 	}
     /**
@@ -20,6 +21,11 @@ class BookController extends Controller
     public function index()
     {
 		$books = Books::all();
+		if (!$books)
+		{
+			return ["message" => "no book"];
+
+		}
 		return $books;
     }
 
@@ -41,10 +47,33 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+		$validator = Validator::make(
+		    [
+		        'owner_id' => $request->owner_id,
+		        'code' =>  $request->code,
+		    ],
+		    [
+		        'owner_id' => 'required|integer',
+		        'code' => 'required|min:8|max:8|unique:books',
+		    ]
+			);
+		if ($validator->fails())
+		{
+			$error = $validator->errors()->first();
+			return ["message" => $error];
+		}
+		$user = DB::table('users')->where('id', $request->owner_id)->first();
+
+		if (!$user)
+		{
+			return ["message" => "book owner dosent exist!"];
+		}
+
         $book = new Books;
 		$book->name = $request->name;
 		$book->author = $request->author;
 		$book->publisher = $request->publisher;
+		$book->code = $request->code;
 		$book->owner_id = $request->owner_id;	
 		$book->save();
 		return ["name" => $book->name, "author" => $book->author, "publisher" => $book->publisher, "owner_id" => $book->owner_id];
@@ -59,7 +88,10 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Books::find($id);
-        return $book;
+        if (!$book){
+        	return ["message" => "book dosent exist!"];
+        }
+        return json_encode($book);
     }
 
     /**
@@ -83,7 +115,27 @@ class BookController extends Controller
     public function update(Request $request, $id)
     {
         $book = Books::find($id);
-		// Make sure you've got the Page model
+		$validator = Validator::make(
+		    [
+		        'owner_id' => $request->owner_id,
+		        'code' =>  $request->code,
+		    ],
+		    [
+		        'owner_id' => 'required|integer',
+		        'code' => 'required|min:8|max:8|unique:books',
+		    ]
+			);
+		if ($validator->fails())
+		{
+			$error = $validator->errors()->first();
+			return ["message" => $error];
+		}
+		$user = DB::table('users')->where('id', $request->owner_id)->first();
+
+		if (!$user)
+		{
+			return ["message" => "book owner dosent exist!"];
+		}
 		if($book) {
 		    $book->name = $request->name;
 		    $book->author = $request->author;
@@ -109,6 +161,9 @@ class BookController extends Controller
     public function destroy($id)
     {
         $book = Books::find($id);
+        if (!$book){
+        	return ["message" => "book dosent exist!"];
+        }
         $book->delete();
         return ["message" => "dropped successfully"];
     }
