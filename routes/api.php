@@ -34,7 +34,6 @@ Route::delete('book/{id}', "BookController@destroy");
 
 Route::post('user/books/{owner_id}', 'AuthController@show_books');
 Route::post('user/borrows/{borrower_id}', 'AuthController@show_borrows');
-Route::get('user/borrow/', 'AuthController@borrow');
 
 //BORROWS RESTFUL API
 Route::get('borrow', "BorrowsController@index");

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\User;
 use JWTAuth;
+use Auth;
 use DB;
 
 
@@ -110,9 +111,7 @@ class AuthController extends Controller
 
     }
 
-    public function borrow(Request $request, $id)
-    {
-    }
+ 
     protected function respondWithToken($token)
     {
       return response()->json([

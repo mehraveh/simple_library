@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Borrow;
+use JWTAuth;
+use DB;
+
 
 class BorrowsController extends Controller
 {
@@ -46,19 +49,19 @@ class BorrowsController extends Controller
      */
     public function store(Request $request)
     {
+        $currentUser = JWTAuth::parseToken()->authenticate();
+        $borrower_id = $currentUser['ID'];
         $validator = Validator::make(
             [
-                'borrower_id' => $request->borrower_id,
                 'book_id' =>  $request->book_id,
                 'borrowed_at' => $request->borrowed_at,
                 'take_back_at' => $request->take_back_at,
-                'taken_back' => $request->taken_back;
+                'taken_back' => $request->taken_back
             ],
             [
-                'borrower_id' => 'required|integer',
                 'book_id' => 'required|integer',
-                'borrowed_at' => 'required|date_format:Y-m-d:h-m-s',
-                'take_back_at' => 'required|date_format:Y-m-d:h-m-s',
+                'borrowed_at' => 'required|date_format:"Y.m.j H:i:s"',
+                'take_back_at' => 'required|date_format:"Y.m.j H:i:s"',
                 'taken_back' => 'boolean'
             ]
             );
@@ -68,7 +71,7 @@ class BorrowsController extends Controller
             return json_encode($error);
         }
 
-        $user = DB::table('users')->where('id', $request->borrower_id)->first();
+        $user = DB::table('users')->where('id', $borrower_id)->first();
 
         if (!$user)
         {
@@ -83,13 +86,13 @@ class BorrowsController extends Controller
         }
 
         $borrow = new Borrow;
-        $borrow->borrower_id = $request->borrower_id;
+        $borrow->borrower_id = $borrower_id;
         $borrow->borrowed_at = $request->borrowed_at;
         $borrow->take_back_at = $request->take_back_at;
         $borrow->taken_back = $request->taken_back;
         $borrow->book_id = $request->book_id;   
         $borrow->save();
-        return json_encode($borrows);
+        return json_encode($borrow);
     }
 
     /**
@@ -106,7 +109,6 @@ class BorrowsController extends Controller
             return ["message" => "no borrow"];
 
         }
-        retur
         return json_encode($borrow);
     }
 
@@ -130,20 +132,20 @@ class BorrowsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $currentUser = JWTAuth::parseToken()->authenticate();
+        $borrower_id = $currentUser['ID'];
         $borrow = Borrow::find($id);
         $validator = Validator::make(
             [
-                'borrower_id' => $request->borrower_id,
                 'book_id' =>  $request->book_id,
                 'borrowed_at' => $request->borrowed_at,
                 'take_back_at' => $request->take_back_at,
-                'taken_back' => $request->taken_back;
+                'taken_back' => $request->taken_back
             ],
             [
-                'borrower_id' => 'required|integer',
                 'book_id' => 'required|integer',
-                'borrowed_at' => 'required|date_format:Y-m-d:h-m-s',
-                'take_back_at' => 'required|date_format:Y-m-d:h-m-s',
+                'borrowed_at' => 'required|date_format:"Y.m.j H:i:s"',
+                'take_back_at' => 'required|date_format:"Y.m.j H:i:s"',
                 'taken_back' => 'boolean'
             ]
             );
@@ -153,7 +155,7 @@ class BorrowsController extends Controller
             return json_encode($error);
         }
 
-        $user = DB::table('users')->where('id', $request->borrower_id)->first();
+        $user = DB::table('users')->where('id', $borrower_id)->first();
 
         if (!$user)
         {
@@ -169,12 +171,14 @@ class BorrowsController extends Controller
 
         if($borrow)
         {
-            $borrow->borrower_id = $request->borrower_id;
+            $borrow->borrower_id = $borrower_id;
             $borrow->borrowed_at = $request->borrowed_at;
             $borrow->take_back_at = $request->take_back_at;
             $borrow->taken_back = $request->taken_back;
             $borrow->book_id = $request->book_id;   
             $borrow->save();
+            return json_encode($borrow);
+
         }
 
         else
@@ -201,5 +205,7 @@ class BorrowsController extends Controller
         $borrow->delete();
         return ["message" => "dropped successfully"];
     }
+
+
 
 }
