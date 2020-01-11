@@ -32,8 +32,8 @@ Route::post('book', "BookController@store");
 Route::put('book/{id}', "BookController@update");
 Route::delete('book/{id}', "BookController@destroy");
 
-Route::post('user/books/{owner_id}', 'AuthController@show_books');
-Route::post('user/borrows/{borrower_id}', 'AuthController@show_borrows');
+Route::get('user/books/', 'AuthController@show_my_books');
+Route::get('user/borrows/', 'AuthController@show_my_borrows');
 
 //BORROWS RESTFUL API
 Route::get('borrow', "BorrowsController@index");

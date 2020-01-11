@@ -95,23 +95,27 @@ class AuthController extends Controller
         return response()->json(['message'=>'Successfully logged out']);
     }
 
-    public function show_books($owner_id)
+    public function show_my_books()
     {
+    	$currentUser = JWTAuth::parseToken()->authenticate();
+        $owner_id = $currentUser['ID'];
 		$books = DB::table('books')->where('owner_id', $owner_id)->get();
         return json_encode($books);
 		
 
     }
 
-    public function show_borrows($borrower_id)
+    public function show_my_borrows()
     {
+    	$currentUser = JWTAuth::parseToken()->authenticate();
+        $borrower_id = $currentUser['ID'];
 		$borrows = DB::table('borrows')->where('borrower_id', $borrower_id)->get();
         return json_encode($borrows);
 		
 
     }
 
- 
+
     protected function respondWithToken($token)
     {
       return response()->json([
