@@ -39,10 +39,11 @@ class AuthController extends Controller
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
+            'super_user' => $request->get('super_user'),
         ]);
         //return $user;
-        $credentials = $request->only('email', 'password', 'name');
-        $token = JWTAuth::attempt($credentials);
+/*        $credentials = $request->only('email', 'password', 'name');
+*/      $token = JWTAuth::fromUser($user);
         return response()->json(compact('user','token'),201);
     }
 
@@ -63,10 +64,10 @@ class AuthController extends Controller
 }
 
 
-    public function getAuthUser(Request $request)
+    public function getAuthUser()
     {
 
-        try {
+/*        try {
 
             if (! $user = JWTAuth::parseToken()->authenticate()) {
                         return response()->json(['user_not_found'], 404);
@@ -84,8 +85,8 @@ class AuthController extends Controller
 
                 return response()->json(['token_absent'], $e->getStatusCode());
 
-        }
-
+        }*/
+        $user = JWTAuth::parseToken()->authenticate();
         return response()->json(compact('user'));
     }
 
@@ -125,5 +126,11 @@ class AuthController extends Controller
         'expires_in' => auth()->factory()->getTTL() * 60
       ]);
     }
+  
+   public function users()
+   {
 
+        $users = User::all();
+        return json_encode($users);
+   }
 }

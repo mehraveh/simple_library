@@ -32,6 +32,7 @@
                     return response()->json(['status' => 'Authorization Token not found']);
                 }
             }
+            $user = JWTAuth::parseToken()->authenticate();
             return $next($request);
         }
     }

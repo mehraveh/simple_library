@@ -29,15 +29,18 @@ Route::get('user', 'AuthController@getAuthUser');
 Route::get('book', "BookController@index");
 Route::get('book/{id}', "BookController@show");
 Route::post('book', "BookController@store");
-Route::put('book/{id}', "BookController@update");
-Route::delete('book/{id}', "BookController@destroy");
+Route::put('book/{id}', "BookController@update")->middleware('jwt_super_user.verify');
+Route::delete('book/{id}', "BookController@destroy")->middleware('jwt_super_user.verify');
 
 Route::get('user/books/', 'AuthController@show_my_books');
 Route::get('user/borrows/', 'AuthController@show_my_borrows');
+Route::get('user/users/', 'AuthController@users')->middleware('jwt_super_user.verify');
 
 //BORROWS RESTFUL API
-Route::get('borrow', "BorrowsController@index");
-Route::post('borrow/{id}', "BorrowsController@show");
+Route::get('borrow', "BorrowsController@index")->middleware('jwt_super_user.verify');
+Route::post('borrow/{id}', "BorrowsController@show")->middleware('jwt_super_user.verify');
 Route::post('borrow', "BorrowsController@store");
-Route::put('borrow/{id}', "BorrowsController@update");
-Route::delete('borrow/{id}', "BorrowsController@destroy");
+Route::put('borrow/{id}', "BorrowsController@update")->middleware('jwt_super_user.verify');
+Route::delete('borrow/{id}', "BorrowsController@destroy")->middleware('jwt_super_user.verify');;
+
+Route::get('sendmail','MailController@send_email');

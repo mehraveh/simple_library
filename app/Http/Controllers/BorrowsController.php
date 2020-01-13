@@ -10,9 +10,12 @@ use DB;
 
 class BorrowsController extends Controller
 {
-    public function __construct()
+    protected $mail_controller;
+    public function __construct(MailController $mail_controller)
     {
         $this->middleware('jwt.verify');
+        //$this->mail_controller = new MailController();
+        $this->mail_controller = $mail_controller;
 
     }
 
@@ -84,6 +87,7 @@ class BorrowsController extends Controller
         {
             return ["message" => "book dosent exist!"];
         }
+        $book_owner = DB::table('users')->where('id', $book->owner_id)->first();
 
         $borrow = new Borrow;
         $borrow->borrower_id = $borrower_id;
@@ -91,7 +95,9 @@ class BorrowsController extends Controller
         $borrow->take_back_at = $request->take_back_at;
         $borrow->taken_back = $request->taken_back;
         $borrow->book_id = $request->book_id;   
+        $borrow->mode = 'accepted';
         $borrow->save();
+        $this->mail_controller->send_email($book_owner->email);
         return json_encode($borrow);
     }
 

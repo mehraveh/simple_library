@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Books;
+use JWTAuth;
 use DB;
 class BookController extends Controller
 {
 	public function __construct()
 	{
 		$this->middleware('jwt.verify');
+		//$this->middleware('jwt_super_user.verify', ['except' => ['store', 'show', 'index']]);
 
 	}
     /**
@@ -47,13 +49,13 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+    	$currentUser = JWTAuth::parseToken()->authenticate();
+        $owner_id = $currentUser['ID'];
 		$validator = Validator::make(
 		    [
-		        'owner_id' => $request->owner_id,
 		        'code' =>  $request->code,
 		    ],
 		    [
-		        'owner_id' => 'required|integer',
 		        'code' => 'required|min:8|max:8|unique:books',
 		    ]
 			);
@@ -62,7 +64,7 @@ class BookController extends Controller
 			$error = $validator->errors()->first();
 			return ["message" => $error];
 		}
-		$user = DB::table('users')->where('id', $request->owner_id)->first();
+		$user = DB::table('users')->where('id', $owner_id)->first();
 
 		if (!$user)
 		{
@@ -74,9 +76,9 @@ class BookController extends Controller
 		$book->author = $request->author;
 		$book->publisher = $request->publisher;
 		$book->code = $request->code;
-		$book->owner_id = $request->owner_id;	
+		$book->owner_id = $owner_id;	
 		$book->save();
-		return ["name" => $book->name, "author" => $book->author, "publisher" => $book->publisher, "owner_id" => $book->owner_id];
+		return json_encode($book);
     }
 
     /**
