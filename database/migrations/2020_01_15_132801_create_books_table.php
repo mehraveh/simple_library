@@ -13,11 +13,20 @@ class CreateBooksTable extends Migration
      */
     public function up()
     {
+        Schema::enableForeignKeyConstraints();
         Schema::create('books', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->timestamps();
-        });
+            $table->increments('id');
+            $table->integer('owner_id');
+            $table->string('author');
+            $table->string('name');
+            $table->string('publisher');
+            $table->string('code')->unique();
+            //$table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
+            $table->timestamps();       
+
+         });
     }
+    
 
     /**
      * Reverse the migrations.

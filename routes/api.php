@@ -26,11 +26,11 @@ Route::get('logout', 'AuthController@logout');
 Route::get('user', 'AuthController@getAuthUser');
 
 //BOOKS RESTFUL API
-Route::get('book', "BookController@index");
-Route::get('book/{id}', "BookController@show");
-Route::post('book', "BookController@store");
-Route::put('book/{id}', "BookController@update")->middleware('jwt_super_user.verify');
-Route::delete('book/{id}', "BookController@destroy")->middleware('jwt_super_user.verify');
+Route::get('book', "BooksController@index");
+Route::get('book/{id}', "BooksController@show");
+Route::post('book', "BooksController@store");
+Route::put('book/{id}', "BooksController@update")->middleware('jwt_super_user.verify');
+Route::delete('book/{id}', "BooksController@destroy")->middleware('jwt_super_user.verify');
 
 Route::get('user/books/', 'AuthController@show_my_books');
 Route::get('user/borrows/', 'AuthController@show_my_borrows');

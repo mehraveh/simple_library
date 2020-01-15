@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Books extends Model
+class Book extends Model
 {
 
     protected $fillable = ["name", "author", "publisher","ownder_id"];

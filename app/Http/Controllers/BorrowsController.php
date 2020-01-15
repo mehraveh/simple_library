@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Borrow;
+use App\Http\Models\User;
+use App\Http\Models\Book;
+use App\Http\Models\borrow;
 use JWTAuth;
 use DB;
 
@@ -53,7 +55,7 @@ class BorrowsController extends Controller
     public function store(Request $request)
     {
         $currentUser = JWTAuth::parseToken()->authenticate();
-        $borrower_id = $currentUser['ID'];
+        $borrower_id = $currentUser->id;
         $validator = Validator::make(
             [
                 'book_id' =>  $request->book_id,
@@ -74,20 +76,20 @@ class BorrowsController extends Controller
             return json_encode($error);
         }
 
-        $user = DB::table('users')->where('id', $borrower_id)->first();
+        $user = Users::where('id', $borrower_id)->first();
 
         if (!$user)
         {
             return ["message" => "borrower dosent exist!"];
         }
 
-        $book = DB::table('books')->where('id', $request->book_id)->first();
+        $book = Book::where('id', $request->book_id)->first();
 
         if (!$book)
         {
             return ["message" => "book dosent exist!"];
         }
-        $book_owner = DB::table('users')->where('id', $book->owner_id)->first();
+        $book_owner = User::where('id', $book->owner_id)->first();
 
         $borrow = new Borrow;
         $borrow->borrower_id = $borrower_id;
@@ -139,7 +141,7 @@ class BorrowsController extends Controller
     public function update(Request $request, $id)
     {
         $currentUser = JWTAuth::parseToken()->authenticate();
-        $borrower_id = $currentUser['ID'];
+        $borrower_id = $currentUser->id;
         $borrow = Borrow::find($id);
         $validator = Validator::make(
             [
@@ -161,14 +163,14 @@ class BorrowsController extends Controller
             return json_encode($error);
         }
 
-        $user = DB::table('users')->where('id', $borrower_id)->first();
+        $user = User::where('id', $borrower_id)->first();
 
         if (!$user)
         {
             return ["message" => "borrower dosent exist!"];
         }
 
-        $book = DB::table('books')->where('id', $request->book_id)->first();
+        $book = Book::where('id', $request->book_id)->first();
 
         if (!$book)
         {

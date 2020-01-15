@@ -6,7 +6,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use App\User;
+use App\Http\Models\User;
+use App\Http\Models\Book;
+use App\Http\Models\borrow;
 use JWTAuth;
 use Auth;
 use DB;
@@ -100,8 +102,8 @@ class AuthController extends Controller
     public function show_my_books()
     {
     	$currentUser = JWTAuth::parseToken()->authenticate();
-        $owner_id = $currentUser['ID'];
-		$books = DB::table('books')->where('owner_id', $owner_id)->get();
+        $owner_id = $currentUser->id;
+		$books = Book::where('owner_id', $owner_id)->get();
         return json_encode($books);
 		
 
@@ -110,8 +112,8 @@ class AuthController extends Controller
     public function show_my_borrows()
     {
     	$currentUser = JWTAuth::parseToken()->authenticate();
-        $borrower_id = $currentUser['ID'];
-		$borrows = DB::table('borrows')->where('borrower_id', $borrower_id)->get();
+        $borrower_id = $currentUser->id;
+		$borrows = Borrow::where('borrower_id', $borrower_id)->get();
         return json_encode($borrows);
 		
 

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Books;
+use App\Http\Models\User;
+use App\Http\Models\Book;
+use App\Http\Models\borrow;
 use JWTAuth;
 use DB;
-class BookController extends Controller
+class BooksController extends Controller
 {
 	public function __construct()
 	{
@@ -22,7 +24,7 @@ class BookController extends Controller
      */
     public function index()
     {
-		$books = Books::all();
+		$books = Book::all();
 		if (!$books)
 		{
 			return ["message" => "no book"];
@@ -50,7 +52,7 @@ class BookController extends Controller
     public function store(Request $request)
     {
     	$currentUser = JWTAuth::parseToken()->authenticate();
-        $owner_id = $currentUser['ID'];
+        $owner_id = $currentUser->id;
 		$validator = Validator::make(
 		    [
 		        'code' =>  $request->code,
@@ -64,14 +66,14 @@ class BookController extends Controller
 			$error = $validator->errors()->first();
 			return ["message" => $error];
 		}
-		$user = DB::table('users')->where('id', $owner_id)->first();
+		$user = User::where('id', $owner_id)->first();
 
 		if (!$user)
 		{
 			return ["message" => "book owner dosent exist!"];
 		}
 
-        $book = new Books;
+        $book = new Book;
 		$book->name = $request->name;
 		$book->author = $request->author;
 		$book->publisher = $request->publisher;
@@ -89,7 +91,7 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $book = Books::find($id);
+        $book = Book::find($id);
         if (!$book){
         	return ["message" => "book dosent exist!"];
         }
@@ -116,7 +118,7 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $book = Books::find($id);
+        $book = Book::find($id);
 		$validator = Validator::make(
 		    [
 		        'owner_id' => $request->owner_id,
@@ -132,7 +134,7 @@ class BookController extends Controller
 			$error = $validator->errors()->first();
 			return ["message" => $error];
 		}
-		$user = DB::table('users')->where('id', $request->owner_id)->first();
+		$user = User::where('id', $request->owner_id)->first();
 
 		if (!$user)
 		{
@@ -162,7 +164,7 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        $book = Books::find($id);
+        $book = Book::find($id);
         if (!$book){
         	return ["message" => "book dosent exist!"];
         }
