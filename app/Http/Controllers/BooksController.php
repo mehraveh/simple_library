@@ -168,6 +168,8 @@ class BooksController extends Controller
         if (!$book){
         	return ["message" => "book dosent exist!"];
         }
+        $borrow = Borrow::where('book_id', $id)->get();
+        $borrow->delete();
         $book->delete();
         return ["message" => "dropped successfully"];
     }

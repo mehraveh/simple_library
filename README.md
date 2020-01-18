@@ -76,4 +76,23 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# simple_library
+
+# Simple Library
+
+This is a small  laravel project with restful api
+
+```
+
+### Installing
+
+$ git clone
+$ cp .env.example .env
+$ composer install
+$ php artisan migrate
+$ php artisan db:seed
+$ php artisan serve
+
+
+## requests
+import from this link
+https://www.getpostman.com/collections/573b4e6e188b0f9461d2
