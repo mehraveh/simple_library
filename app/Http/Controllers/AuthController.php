@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Models\User;
 use App\Http\Models\Book;
 use App\Http\Models\Borrow;
+use App\Helpers\Utils;
 use JWTAuth;
 use Auth;
 use DB;
@@ -18,15 +19,20 @@ class AuthController extends Controller
 {
     public $loginAfterSignUp = true;
 
-       public function __construct()
+       public function __construct(MailController $mail_controller, Utils $utils)
     {
+        $this->mail_controller = $mail_controller;
+        $this->utils = $utils;
         //$this->middleware('jwt.verify', ['except' => ['login', 'register']]);
        // $this->middleware('auth1', ['except' => ['register']]);
 
     }
 
+
+
     public function register(Request $request)
     {
+        dd(Hash::make($request->get('password')));
 	    $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -36,32 +42,52 @@ class AuthController extends Controller
         if($validator->fails()){
                 return response()->json($validator->errors()->toJson(), 400);
         }
-
+        $code = $this->utils->get_code(8);
         $user = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
             'super_user' => $request->get('super_user'),
         ]);
-        //return $user;
-/*        $credentials = $request->only('email', 'password', 'name');
-*/      $token = JWTAuth::fromUser($user);
-        return response()->json(compact('user','token'),201);
+        $userp = User::where("id", $user->id)->first();
+        $userp->code = $code;
+        $userp->save();
+        $this->mail_controller->send_verification_email($user->email, $user->name, $code);
+        return "we have send verification email to you!";
+    }
+
+
+    public function verify(Request $request, $id)
+    {
+        $user = User::where('id', $id)->first();
+         if ($user->code != '' &&  $user->code == $request->get('code'))
+         {
+            $token = JWTAuth::fromUser($user);
+            $user->is_verified = true;
+            $user->code = '';
+            $user->save();
+            return response()->json(compact('user','token'),201);
+
+         }
+         return response()->json(['error' => 'invalid_code'], 500);
+
     }
 
 
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
+        $user = User::where('email', $credentials["email"])->first();
+        if(!$user->is_verified){
+            return response()->json(['error' => 'user_not_verfied'], 500);
+        }
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'invalid_credentials'], 400);
             }
-        } catch (JWTException $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
-
         return response()->json(compact('token'));     
      }
 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBooksTable extends Migration
+class CreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,19 +14,17 @@ class CreateBooksTable extends Migration
     public function up()
     {
         Schema::enableForeignKeyConstraints();
-        Schema::create('books', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('owner_id');
-            $table->string('author');
+            $table->string('email')->unique();
+            $table->string('code')->default('');
+            $table->boolean('is_verified')->default(0);
+            $table->string('password');
             $table->string('name');
-            $table->string('publisher');
-            $table->string('code')->unique();
-            //$table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps();       
-
-         });
+            $table->boolean('super_user')->default(0);
+            $table->timestamps();
+        });
     }
-    
 
     /**
      * Reverse the migrations.
@@ -35,6 +33,6 @@ class CreateBooksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('users');
     }
 }
