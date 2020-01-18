@@ -84,12 +84,12 @@ This is a small  laravel project with restful api
 
 ## Installing
 
-$ git clone
-$ cp .env.example .env
-$ composer install
-$ php artisan migrate
-$ php artisan db:seed
-$ php artisan serve
+$ git clone <br />
+$ cp .env.example .env <br />
+$ composer install <br />
+$ php artisan migrate <br />
+$ php artisan db:seed <br />
+$ php artisan serve <br />
 
 
 ## requests
