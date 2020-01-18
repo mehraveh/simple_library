@@ -83,7 +83,7 @@ This is a small  laravel project with restful api
 
 ```
 
-### Installing
+## Installing
 
 $ git clone
 $ cp .env.example .env
