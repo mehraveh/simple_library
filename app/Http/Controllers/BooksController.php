@@ -6,14 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Models\User;
 use App\Http\Models\Book;
-use App\Http\Models\borrow;
+use App\Http\Models\Borrow;
 use JWTAuth;
 use DB;
 class BooksController extends Controller
 {
 	public function __construct()
 	{
-		$this->middleware('jwt.verify');
+		//$this->middleware('jwt.verify');
 		//$this->middleware('jwt_super_user.verify', ['except' => ['store', 'show', 'index']]);
 
 	}

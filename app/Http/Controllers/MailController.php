@@ -10,11 +10,27 @@ use App\Http\Controllers\Controller;
 class MailController extends Controller {
 
 
-   public function send_email($mail_address) {
+   public function send_borrow_request_email($mail_address, $name) {
 
-		Mail::raw('some one wants to borrow your book', function ($message)  use ($mail_address){
+		Mail::raw($name . " wants to borrow your book", function ($message)  use ($mail_address){
 		   $message->to($mail_address);
 		   $message->subject("borrow Request");
+		   $message->from("mehraveh.ahmadi1996@gmail.com");});
+   }
+
+   public function send_borrow_request_accepted_email($mail_address, $name) {
+
+		Mail::raw($name . " accepetd your borrow request", function ($message)  use ($mail_address){
+		   $message->to($mail_address);
+		   $message->subject("borrow accepetd");
+		   $message->from("mehraveh.ahmadi1996@gmail.com");});
+   }
+
+   public function send_borrow_request_rejected_email($mail_address, $name) {
+
+		Mail::raw($name . " rejected your borrow request", function ($message)  use ($mail_address){
+		   $message->to($mail_address);
+		   $message->subject("borrow rejected");
 		   $message->from("mehraveh.ahmadi1996@gmail.com");});
    }
 

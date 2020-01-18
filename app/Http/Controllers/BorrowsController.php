@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Models\User;
 use App\Http\Models\Book;
-use App\Http\Models\borrow;
+use App\Http\Models\Borrow;
+use Carbon\Carbon;
 use JWTAuth;
 use DB;
 
@@ -15,7 +16,7 @@ class BorrowsController extends Controller
     protected $mail_controller;
     public function __construct(MailController $mail_controller)
     {
-        $this->middleware('jwt.verify');
+        //$this->middleware('jwt.verify');
         //$this->mail_controller = new MailController();
         $this->mail_controller = $mail_controller;
 
@@ -61,13 +62,11 @@ class BorrowsController extends Controller
                 'book_id' =>  $request->book_id,
                 'borrowed_at' => $request->borrowed_at,
                 'take_back_at' => $request->take_back_at,
-                'taken_back' => $request->taken_back
             ],
             [
                 'book_id' => 'required|integer',
                 'borrowed_at' => 'required|date_format:"Y.m.j H:i:s"',
                 'take_back_at' => 'required|date_format:"Y.m.j H:i:s"',
-                'taken_back' => 'boolean'
             ]
             );
         if ($validator->fails())
@@ -76,7 +75,7 @@ class BorrowsController extends Controller
             return json_encode($error);
         }
 
-        $user = Users::where('id', $borrower_id)->first();
+        $user = User::where('id', $borrower_id)->first();
 
         if (!$user)
         {
@@ -95,11 +94,11 @@ class BorrowsController extends Controller
         $borrow->borrower_id = $borrower_id;
         $borrow->borrowed_at = $request->borrowed_at;
         $borrow->take_back_at = $request->take_back_at;
-        $borrow->taken_back = $request->taken_back;
+        $borrow->taken_back = false;
         $borrow->book_id = $request->book_id;   
-        $borrow->mode = 'accepted';
+        $borrow->mode = 'pending';
         $borrow->save();
-        $this->mail_controller->send_email($book_owner->email);
+        $this->mail_controller->send_borrow_request_email($book_owner->email, $book_owner->name);
         return json_encode($borrow);
     }
 
@@ -183,7 +182,8 @@ class BorrowsController extends Controller
             $borrow->borrowed_at = $request->borrowed_at;
             $borrow->take_back_at = $request->take_back_at;
             $borrow->taken_back = $request->taken_back;
-            $borrow->book_id = $request->book_id;   
+            $borrow->book_id = $request->book_id; 
+            $borrow->mode = $request->mode;  
             $borrow->save();
             return json_encode($borrow);
 
@@ -214,6 +214,64 @@ class BorrowsController extends Controller
         return ["message" => "dropped successfully"];
     }
 
+    public function accept($id)
+    {
+        $borrow = Borrow::find($id);
+        if (!$borrow)
+        {
+            return ["message" => "no borrow"];
 
+        }
+        $user = JWTAuth::parseToken()->authenticate();
+        $book = Book::where('id', $borrow->book_id)->first();
+        $user_2 = User::where('id', $book->owner_id)->first();
+        if( $user->id != $book->owner_id){
+            return response()->json(["message" => "This borrow is not yours!!!"], 403);
+        }
+        $borrow->mode = 'accepted';
+        $borrow->save();
+        $this->mail_controller->send_borrow_request_accepted_email($user_2->email, $user_2->name);
+        return json_encode($borrow);
+
+    }
+
+    public function reject($id)
+    {
+        $borrow = Borrow::find($id);
+        if (!$borrow)
+        {
+            return ["message" => "no borrow"];
+
+        }
+        $user = JWTAuth::parseToken()->authenticate();
+        $book = Book::where('id', $borrow->book_id)->first();
+        $user_2 = User::where('id', $book->owner_id)->first();
+        if( $user->id != $book->owner_id){
+            return response()->json(["message" => "This borrow is not yours!!!"], 403);
+        }
+        $borrow->mode = 'reject';
+        $borrow->save();
+        $this->mail_controller->send_borrow_request_rejected_email($user_2->email, $user_2->name);
+        return json_encode($borrow);
+
+    }
+
+    public function take_back($id)
+    {
+        $borrow = Borrow::find($id);
+        if (!$borrow)
+        {
+            return ["message" => "no borrow"];
+
+        }
+        $mytime = Carbon::now();
+
+        if($mytime >= $borrow->take_back_at){
+            return "take back it";
+        }
+        else{
+            dd($mytime->toDateTimeString(), $borrow->take_back_at);
+        }
+    }
 
 }
