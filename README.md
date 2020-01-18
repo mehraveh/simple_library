@@ -81,7 +81,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 This is a small  laravel project with restful api
 
-```
 
 ## Installing
 
