@@ -14,12 +14,9 @@ class UsersTest extends TestCase
     /** @test */
         public function user_test()
     {
-        $user = User::find(11); // sample user
+        $user = User::find(11);
         $token = JWTAuth::fromUser($user);
         $response =  $this->get('api/user/', ['HTTP_Authorization' => 'Bearer ' . $token]);
-
-        //$response = $this->get('/api/user/');
-        //dd($response);
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson(["user" => ['name' => $user->name]]);
     }
 }

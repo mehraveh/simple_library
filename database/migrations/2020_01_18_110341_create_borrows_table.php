@@ -14,9 +14,11 @@ class CreateBorrowsTable extends Migration
     public function up()
     {
         Schema::create('borrows', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('borrower_id');
-            $table->integer('book_id');
+            $table->increments('id');
+            $table->unsignedInteger('borrower_id');
+            $table->foreign('borrower_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade'); 
+            $table->unsignedInteger('book_id');
+            $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade')->onUpdate('cascade'); 
             $table->enum('mode', ['accepted', 'pending', 'reject']);
             $table->dateTime('borrowed_at'); 
             $table->dateTime('take_back_at'); 

@@ -68,4 +68,7 @@ Route::get('reject/{id}', "BorrowsController@reject")->middleware('jwt.verify');
 
 Route::get('take_back/{id}', "BorrowsController@take_back")->middleware('jwt.verify');
 
-#Route::get('sendmail','MailController@send_email');
+#PROFILE URLS
+Route::post('add', "ProfileController@store")->middleware('jwt.verify');
+
+Route::post('edit', "ProfileController@update")->middleware('jwt.verify');

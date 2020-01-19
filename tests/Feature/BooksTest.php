@@ -14,11 +14,10 @@ class BooksTest extends TestCase
       /** @test */
     public function books_test_ok()
     {
-        $user = User::find(11); // sample user
+        $user = User::find(11);
         $token = JWTAuth::fromUser($user);
         $response =  $this->get('api/book/', ['HTTP_Authorization' => 'Bearer ' . $token]);
 
-        //$response = $this->get('/api/user/');
         $response->assertStatus(200);
     }
 
@@ -26,13 +25,13 @@ class BooksTest extends TestCase
         /** @test */
     public function book_test_ok()
     {
-        $user = User::find(11); // sample user
+        $user = User::find(11);
         $token = JWTAuth::fromUser($user);
         $response =  $this->get('api/book/1', ['HTTP_Authorization' => 'Bearer ' . $token]);
 
-        //$response = $this->get('/api/user/');
         $response->assertStatus(200);
     }
+
       /** @test */
     public function books_test_fail()
     {
@@ -40,6 +39,7 @@ class BooksTest extends TestCase
 
         $response->assertStatus(401);
     }
+
 
      /** @test */
         public function book_test_fail()

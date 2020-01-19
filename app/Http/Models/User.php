@@ -5,6 +5,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Http\Models\Book;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -44,5 +45,15 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function books()
+    {
+        return $this->hasMany(Book::class);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class, 'foreign_key');
     }
  }
