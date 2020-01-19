@@ -82,7 +82,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 This is a small  laravel project with restful api
 
 
-## Run app
+## Run App
 
 $ git clone <br />
 $ cp .env.example .env <br />
@@ -91,6 +91,9 @@ $ php artisan migrate <br />
 $ php artisan db:seed <br />
 $ php artisan serve <br />
 
+## Run Tests
+ 
+$ phpunit <br />
 
 ## requests
 import from this link
